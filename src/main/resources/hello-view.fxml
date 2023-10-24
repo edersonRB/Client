@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sistemasdistribuidos.cliente.ClientController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+    <Label fx:id="connectionIPLabel" text="I.P." />
+    <TextField fx:id="connectionIP" text="192.168.15.6" />
+    <Label fx:id="connectionPortLabel" text="Porta" />
+    <TextField fx:id="connectionPort" text="5555" />
+    <Button fx:id="helloButton" onAction="#onHelloButtonClick" text="Conectar" />
+
+    <HBox fx:id="loginBox" alignment="CENTER" spacing="10.0" visible="false">
+        <Label text="Email" />
+        <TextField fx:id="emailField" />
+        <Label text="Senha" />
+        <PasswordField fx:id="passwordField" />
+        <Button fx:id="loginButton" onAction="#onLoginClick" text="Login" />
+    </HBox>
+
+    <Label fx:id="welcomeText" prefHeight="17.0" prefWidth="257.0" />
+   <Button fx:id="logoutButton" mnemonicParsing="false" onAction="#onLogoutClicked" text="Logout" />
+</VBox>
