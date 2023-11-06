@@ -20,7 +20,7 @@
 
     <HBox fx:id="connectBox" alignment="CENTER" managed="true" spacing="10.0" visible="true">
         <Label fx:id="connectionIPLabel" text="I.P." />
-        <TextField fx:id="connectionIP" text="192.168.15.3" />
+        <TextField fx:id="connectionIP" text="10.40.24.80" />
         <Label fx:id="connectionPortLabel" text="Porta" />
         <TextField fx:id="connectionPort" text="23555" />
         <Button fx:id="helloButton" onAction="#onHelloButtonClick" text="Conectar" />
@@ -53,6 +53,8 @@
 
     <HBox fx:id="profileBox" alignment="CENTER" managed="false" spacing="10.0" visible="false">
         <Button fx:id="mydataButton" mnemonicParsing="false" onAction="#onMyDataClick" text="Ver meus dados" />
+        <Button managed="false" visible="false" fx:id="listUsersButton" mnemonicParsing="false" onAction="#onListUsersClick" text="Ver todos os usuarios" />
         <Button fx:id="logoutButton" mnemonicParsing="false" onAction="#onLogoutClick" text="Logout" />
+        <Button fx:id="selfDeleteButton" mnemonicParsing="false" onAction="#onSelfDeleteClick" text="Excluir conta" />
     </HBox>
 </VBox>

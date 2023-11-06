@@ -12,13 +12,21 @@ import org.apache.commons.codec.digest.DigestUtils;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
+
 import java.io.*;
 import java.net.*;
+import java.util.Optional;
+
 import javafx.application.Platform;
 import org.json.JSONObject;
 import org.json.JSONException;
 
 public class ClientController {
+    private static String SECRET_KEY = "AoT3QFTTEkj16rCby/TPVBWvfSQHL3GeEz3zVwEd6LDrQDT97sgDY8HJyxgnH79jupBWFOQ1+7fRPBLZfpuA2lwwHqTgk+NJcWQnDpHn31CVm63Or5c5gb4H7/eSIdd+7hf3v+0a5qVsnyxkHbcxXquqk9ezxrUe93cFppxH4/kF/kGBBamm3kuUVbdBUY39c4U3NRkzSO+XdGs69ssK5SPzshn01axCJoNXqqj+ytebuMwF8oI9+ZDqj/XsQ1CLnChbsL+HCl68ioTeoYU9PLrO4on+rNHGPI0Cx6HrVse7M3WQBPGzOd1TvRh9eWJrvQrP/hm6kOR7KrWKuyJzrQh7OoDxrweXFH8toXeQRD8=";
+
     @FXML
     private Label pageTitle;
 
@@ -54,6 +62,9 @@ public class ClientController {
 
     @FXML
     private PasswordField register_password;
+
+    @FXML
+    private Button listUsersButton;
     private boolean connected = false;
 
     User user;
@@ -71,7 +82,7 @@ public class ClientController {
                     clientSocket = new Socket(serverAddress, serverPort);
 
                     goToLogin();
-                    goToRegister();
+//                    goToRegister();
 
                     connected = true;
                 } catch (IOException e) {
@@ -156,6 +167,14 @@ public class ClientController {
         alert.setContentText(user.displayUser());
         alert.showAndWait();
     }
+    private static Jws<Claims> parseToken(String token) {
+        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token);
+    }
+    public static boolean isAdmin(String token) {
+        Jws<Claims> parsedToken = parseToken(token);
+
+        return (boolean) parsedToken.getBody().get("isAdmin", Boolean.class);
+    }
     @FXML
     protected void onLoginClick() {
         if (connected) {
@@ -184,7 +203,11 @@ public class ClientController {
                             clearLoginFields();
                             goToProfile();
                             System.out.println("Resposta do servidor: " + response);
-//                            System.out.println("Token recebido: " + token);
+                            if(isAdmin(token)) {
+                                listUsersButton.setVisible(true);
+                                listUsersButton.setManaged(true);
+                            }
+//                          System.out.println("Token recebido: " + token);
                         } else {
                             showWarning(message);
                             System.out.println("Server Response: " + response);
@@ -295,6 +318,11 @@ public class ClientController {
             showWarning("Erro de conexão!");
         }
     }
+
+    @FXML
+    protected void onListUsersClick() {
+        System.out.println("A");
+    }
     @FXML
     protected void onLogoutClick() {
         if (connected) {
@@ -324,6 +352,8 @@ public class ClientController {
                                     e.printStackTrace();
                                 }
                             }
+                            listUsersButton.setVisible(false);
+                            listUsersButton.setManaged(false);
                             goToConnection();
                         } else {
                             showWarning(message);
@@ -339,6 +369,74 @@ public class ClientController {
             showWarning("Conexão falhou");
         }
     }
+
+    @FXML
+    protected void onSelfDeleteClick() {
+        if (connected) {
+            // Ask for email using an input dialog
+            TextInputDialog emailDialog = new TextInputDialog();
+            emailDialog.setTitle("Email Input");
+            emailDialog.setHeaderText("Enter Email:");
+            emailDialog.setContentText("Email:");
+            Optional<String> emailResult = emailDialog.showAndWait();
+
+            if (emailResult.isPresent()) {
+                String email = emailResult.get();
+
+                // Ask for password using an input dialog
+                TextInputDialog passwordDialog = new TextInputDialog();
+                passwordDialog.setTitle("Password Input");
+                passwordDialog.setHeaderText("Enter Password:");
+                passwordDialog.setContentText("Password:");
+                Optional<String> passwordResult = passwordDialog.showAndWait();
+
+                if (passwordResult.isPresent()) {
+                    String password = passwordResult.get();
+
+                    String logoutRequest = "{ \"action\": \"excluir-proprio-usuario\", \"data\": { \"token\": \"" + token + "\", \"email\": \"" + email + "\", \"password\": \"" + password + "\" } }";
+                    System.out.println("Mandando para servidor: " + logoutRequest);
+                    sendMessageToServer(logoutRequest);
+
+                    String response = receiveMessageFromServer();
+                    if (response != null) {
+                        Platform.runLater(() -> {
+                            try {
+                                JSONObject jsonResponse = new JSONObject(response);
+
+                                boolean error = jsonResponse.getBoolean("error");
+                                String message = jsonResponse.getString("message");
+
+                                if (!error) {
+                                    System.out.println("Resposta do servidor: " + response);
+
+                                    emailField.setText("");
+                                    passwordField.setText("");
+
+                                    if (clientSocket != null && !clientSocket.isClosed()) {
+                                        try {
+                                            clientSocket.close();
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                    goToConnection();
+                                } else {
+                                    showWarning(message);
+                                    System.out.println("Resposta do servidor: " + response);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                System.out.println("Error parsing JSON response");
+                            }
+                        });
+                    }
+                }
+            }
+        } else {
+            showWarning("Conexão falhou");
+        }
+    }
+
 
     private void sendMessageToServer(String message) {
         try {
