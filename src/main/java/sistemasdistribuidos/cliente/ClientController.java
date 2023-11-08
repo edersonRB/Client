@@ -4,7 +4,9 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
-
+import javafx.scene.Scene;
+import javafx.scene.control.ListView;
+import javafx.stage.Stage;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -22,6 +24,7 @@ import java.util.Optional;
 
 import javafx.application.Platform;
 import org.json.JSONObject;
+import org.json.JSONArray;
 import org.json.JSONException;
 
 public class ClientController {
@@ -46,7 +49,7 @@ public class ClientController {
     private VBox registerBox;
 
     @FXML
-    private HBox profileBox;
+    private VBox profileBox;
 
     @FXML
     private TextField emailField;
@@ -62,7 +65,34 @@ public class ClientController {
 
     @FXML
     private PasswordField register_password;
+    
+    @FXML
+    private VBox listBox;
+    
+    @FXML
+    private VBox changeBox;
+    
+    @FXML
+    private TextField change_id;
 
+    @FXML
+    private TextField change_name;
+    
+    @FXML
+    private TextField change_email;
+    
+    @FXML
+    private TextField change_password;
+    
+    @FXML
+    private Button changeButton;
+    
+    @FXML
+    private TextField deleteUserId;
+    
+    @FXML
+    private HBox deleteUserBox;
+    
     @FXML
     private Button listUsersButton;
     private boolean connected = false;
@@ -108,7 +138,7 @@ public class ClientController {
     }
 
     private void goToConnection() {
-        setTitle("Conectar a servidor");
+        setTitle("Conecte-se a um servidor");
         connectBox.setVisible(true);
         connectBox.setManaged(true);
         profileBox.setVisible(false);
@@ -117,10 +147,12 @@ public class ClientController {
         loginBox.setManaged(false);
         registerBox.setVisible(false);
         registerBox.setManaged(false);
+        changeBox.setVisible(false);
+        changeBox.setManaged(false);
     }
     @FXML
     private void goToLogin() {
-        setTitle("Faca seu login");
+        setTitle("Entre");
         connectBox.setVisible(false);
         connectBox.setManaged(false);
         profileBox.setVisible(false);
@@ -129,10 +161,12 @@ public class ClientController {
         loginBox.setManaged(true);
         registerBox.setVisible(false);
         registerBox.setManaged(false);
+        changeBox.setVisible(false);
+        changeBox.setManaged(false);
     }
 
     private void goToProfile() {
-        setTitle("Perfil/Opções");
+        setTitle("Menu");
         connectBox.setVisible(false);
         connectBox.setManaged(false);
         profileBox.setVisible(true);
@@ -141,10 +175,12 @@ public class ClientController {
         loginBox.setManaged(false);
         registerBox.setVisible(false);
         registerBox.setManaged(false);
+        changeBox.setVisible(false);
+        changeBox.setManaged(false);
     }
 
     private void goToRegister() {
-        setTitle("Faça seu autocadastro");
+        setTitle("Cadastre-se");
         connectBox.setVisible(false);
         connectBox.setManaged(false);
         profileBox.setVisible(false);
@@ -153,8 +189,24 @@ public class ClientController {
         loginBox.setManaged(false);
         registerBox.setVisible(true);
         registerBox.setManaged(true);
+        changeBox.setVisible(false);
+        changeBox.setManaged(false);
     }
 
+    private void goToChange() {
+        setTitle("Meu perfil");
+        connectBox.setVisible(false);
+        connectBox.setManaged(false);
+        profileBox.setVisible(false);
+        profileBox.setManaged(false);
+        loginBox.setVisible(false);
+        loginBox.setManaged(false);
+        registerBox.setVisible(false);
+        registerBox.setManaged(false);
+        changeBox.setVisible(true);
+        changeBox.setManaged(true);
+    }
+    
     private void showWarning(String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setContentText(message);
@@ -163,7 +215,7 @@ public class ClientController {
 
     private void showUser(User user) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Usuário:");
+        alert.setTitle("Meus dados:");
         alert.setContentText(user.displayUser());
         alert.showAndWait();
     }
@@ -173,7 +225,7 @@ public class ClientController {
     public static boolean isAdmin(String token) {
         Jws<Claims> parsedToken = parseToken(token);
 
-        return (boolean) parsedToken.getBody().get("isAdmin", Boolean.class);
+        return (boolean) parsedToken.getBody().get("admin", Boolean.class);
     }
     @FXML
     protected void onLoginClick() {
@@ -184,7 +236,7 @@ public class ClientController {
             String hashedPassword = hashPasswordMD5(password);
             String loginRequest = "{ \"action\": \"login\", \"data\": { \"email\": \"" + email + "\", \"password\": \"" + hashedPassword + "\" } }";
 
-            System.out.println("Mandando para servidor: " + loginRequest);
+            System.out.println("C-->S: " + loginRequest);
             sendMessageToServer(loginRequest);
 
             String response = receiveMessageFromServer();
@@ -202,15 +254,22 @@ public class ClientController {
 
                             clearLoginFields();
                             goToProfile();
-                            System.out.println("Resposta do servidor: " + response);
+                            System.out.println("S-->C: " + response);
                             if(isAdmin(token)) {
                                 listUsersButton.setVisible(true);
                                 listUsersButton.setManaged(true);
+                                deleteUserBox.setVisible(true);
+                                deleteUserBox.setManaged(true);
                             }
-//                          System.out.println("Token recebido: " + token);
+                            else {
+                                listUsersButton.setVisible(true);
+                                listUsersButton.setManaged(true);
+                                deleteUserBox.setVisible(true);
+                                deleteUserBox.setManaged(true);
+                            }
                         } else {
                             showWarning(message);
-                            System.out.println("Server Response: " + response);
+                            System.out.println("S-->C: " + response);
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -232,10 +291,38 @@ public class ClientController {
         emailField.clear();
         passwordField.clear();
     }
+    
+    private void clearChangeFields() {
+    	change_id.clear();
+    	change_name.clear();
+    	change_password.clear();
+    }
+    
     @FXML
     protected void onSelfRegisterClick() {
         goToRegister();
     }
+    @FXML
+    protected void ongoToProfile() {
+    	goToProfile();
+    }
+    @FXML
+    protected void onChangeUserClick() {
+    	clearChangeFields();
+
+        findMyUser();
+
+    	if(isAdmin(token)) {
+    		change_id.setDisable(false);
+    	} else {
+    		change_id.setDisable(true);
+    		//change_id.setEditable(false);
+    		//change_id.setText("1");
+    	}
+    	
+    	goToChange();
+    }
+
     @FXML
     protected void onRegisterClick() {
         if (connected) {
@@ -246,7 +333,7 @@ public class ClientController {
             String hashedPassword = hashPasswordMD5(password);
             String registerRequest = "{ \"action\": \"autocadastro-usuario\", \"data\": {  \"name\": \"" + name + "\", \"email\": \"" + email + "\", \"password\": \"" + hashedPassword + "\" } }";
 
-            System.out.println("Mandando para servidor: " + registerRequest);
+            System.out.println("C-->S: " + registerRequest);
             sendMessageToServer(registerRequest);
 
             String response = receiveMessageFromServer();
@@ -261,11 +348,10 @@ public class ClientController {
 
                         if (!error && action.equals("autocadastro-usuario")) {
                             clearRegisterFields();
-                            goToLogin();
                         } else {
                             showWarning(message);
                         }
-                        System.out.println("Resposta do servidor: " + response);
+                        System.out.println("S-->C: " + response);
                     } catch (JSONException e) {
                         e.printStackTrace();
                         System.out.println("Error parsing JSON response");
@@ -273,16 +359,15 @@ public class ClientController {
                 });
             }
         } else {
-            showWarning("Erro de conexão!");
+            showWarning("Erro na conexão!");
         }
     }
 
-    @FXML
-    protected void onMyDataClick() {
+    protected void findMyUser() {
         if (connected) {
             String myDataRequest = "{ \"action\": \"pedido-proprio-usuario\", \"data\": {  \"token\": \"" + token + "\"} }";
 
-            System.out.println("Mandando para servidor: " + myDataRequest);
+            System.out.println("C-->S: " + myDataRequest);
             sendMessageToServer(myDataRequest);
 
             String response = receiveMessageFromServer();
@@ -290,6 +375,7 @@ public class ClientController {
                 Platform.runLater(() -> {
                     try {
                         JSONObject jsonResponse = new JSONObject(response);
+                        JSONObject jsonData = jsonResponse.getJSONObject("data");
 
                         String action = jsonResponse.getString("action");
                         boolean error = jsonResponse.getBoolean("error");
@@ -297,17 +383,20 @@ public class ClientController {
 
                         if (!error && action.equals("pedido-proprio-usuario")) {
                             user = new User(
-                                    Integer.parseInt(jsonResponse.getJSONObject("data").getString("id")),
-                                    jsonResponse.getJSONObject("data").getString("name"),
-                                    jsonResponse.getJSONObject("data").getString("email"),
+                                    Integer.parseInt(jsonData.getJSONObject("user").getString("id")),
+                                    jsonData.getJSONObject("user").getString("name"),
+                                    jsonData.getJSONObject("user").getString("email"),
                                     token
-                                    );
-                            user.setAdmin(jsonResponse.getJSONObject("data").getString("type").equals("admin"));
-                            showUser(user);
+                            );
+                            user.setAdmin(jsonData.getJSONObject("user").getString("type").equals("admin"));
+
+                            change_id.setText(Integer.toString(user.getId()));
+                            change_email.setText(user.getEmail());
+                            change_name.setText(user.getName());
                         } else {
                             showWarning(message);
                         }
-                        System.out.println("Resposta do servidor: " + response);
+                        System.out.println("S-->C: " + response);
                     } catch (JSONException e) {
                         e.printStackTrace();
                         System.out.println("Error parsing JSON response");
@@ -315,19 +404,152 @@ public class ClientController {
                 });
             }
         } else {
-            showWarning("Erro de conexão!");
+            showWarning("Erro na conexão!");
+        }
+    }
+    @FXML
+    protected void onMyDataClick() {
+        if (connected) {
+            String myDataRequest = "{ \"action\": \"pedido-proprio-usuario\", \"data\": {  \"token\": \"" + token + "\"} }";
+
+            System.out.println("C-->S: " + myDataRequest);
+            sendMessageToServer(myDataRequest);
+
+            String response = receiveMessageFromServer();
+            if (response != null) {
+                Platform.runLater(() -> {
+                    try {
+                        JSONObject jsonResponse = new JSONObject(response);
+                        JSONObject jsonData = jsonResponse.getJSONObject("data");
+                        
+                        String action = jsonResponse.getString("action");
+                        boolean error = jsonResponse.getBoolean("error");
+                        String message = jsonResponse.getString("message");
+
+                        if (!error && action.equals("pedido-proprio-usuario")) {
+                            user = new User(
+                                    Integer.parseInt(jsonData.getJSONObject("user").getString("id")),
+                                    jsonData.getJSONObject("user").getString("name"),
+                                    jsonData.getJSONObject("user").getString("email"),
+                                    token
+                                    );
+                            user.setAdmin(jsonData.getJSONObject("user").getString("type").equals("admin"));
+                            showUser(user);
+                        } else {
+                            showWarning(message);
+                        }
+                        System.out.println("S-->C: " + response);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        System.out.println("Error parsing JSON response");
+                    }
+                });
+            }
+        } else {
+            showWarning("Erro na conexão!");
         }
     }
 
     @FXML
     protected void onListUsersClick() {
-        System.out.println("A");
+        //System.out.println("A");
+        String listRequest = "{ \"action\": \"listar-usuarios\", \"data\": {  \"token\": \"" + token + "\"} }";
+        System.out.println("C-->S: " + listRequest);
+        sendMessageToServer(listRequest);
+        
+        String response = receiveMessageFromServer();
+        System.out.println("S-->C: " + response);
+        
+        try {
+        	JSONObject jsonObject = new JSONObject(response);
+        	JSONObject dataObject = jsonObject.getJSONObject("data");
+        	JSONArray usersArray = dataObject.getJSONArray("users");
+        		
+        	listBox.setVisible(true);
+        	listBox.getChildren().clear();
+        	
+		        for (int i = 0; i < usersArray.length(); i++) {
+		        	JSONObject userObject = usersArray.getJSONObject(i);
+		        	
+		        	String id = userObject.getString("id");
+		        	String name = userObject.getString("name");
+		        	String type = userObject.getString("type");
+		        	String email = userObject.getString("email");
+		        	
+		        	Text usuario = new Text("ID: " + id + " | Nome: " + name + " | Tipo: " + type + " | email: " + email);
+		        	listBox.getChildren().add(usuario);		        	
+		        }		       
+	    	} catch(JSONException e) {
+            System.out.println(e.toString());
+        }
     }
+        
+    @FXML
+    protected void onChangeClick() {
+    	
+    	String user_id = change_id.getText();
+    	String name = change_name.getText();
+    	String email = change_email.getText();
+    	String password = change_password.getText();
+    	String hashedPassword = hashPasswordMD5(password);
+    	
+    	if(isAdmin(token)) {
+    		try {
+    			String changeRequest = "{ \"action\": \"edicao-usuario\", \"data\": {  \"token\": \"" + token + "\", \"user_id\": \"" + user_id + "\", \"name\": \"" + name + "\", \"email\": \"" + email + "\", \"password\": \"" + hashedPassword + "\", \"type\": \"" + "admin" + "\" } }";    		
+    			
+        		sendMessageToServer(changeRequest);
+        		String response = receiveMessageFromServer();
+        		
+        		JSONObject jsonResponse = new JSONObject(response);
+        		boolean error = jsonResponse.getBoolean("error");
+                String message = jsonResponse.getString("message");
+        		
+                System.out.println("------------------------------------------------------------------");
+        		System.out.println("C-->S: " + changeRequest);
+        		System.out.println("S--C: " + response);
+    			
+    		} catch (JSONException e){
+    			
+    		}
+	
+    	} else {
+    		try {
+    			//pedido para definir id
+    			String DataRequest = "{ \"action\": \"pedido-proprio-usuario\", \"data\": {  \"token\": \"" + token + "\"} }";
+    			sendMessageToServer(DataRequest);
+    			System.out.println("C-->S: " + DataRequest);
+    			String response = receiveMessageFromServer();
+    			System.out.println("S-->C: " + response);
+    			
+    			JSONObject jsonresponse = new JSONObject(response);
+    			JSONObject dataObject = jsonresponse.getJSONObject("data");
+    			//System.out.println(dataObject);
+    			JSONObject userObject = dataObject.getJSONObject("user");
+    			String id = userObject.getString("id");
+    			
+    			String changeRequest = "{ \"action\": \"autoedicao-usuario\", \"data\": { \"token\": \"" + token + "\", \"id\": \"" + id + "\", \"name\": \"" + name + "\", \"email\": \"" + email + "\", \"password\": \"" + hashedPassword + "\"} }";
+    			
+    			sendMessageToServer(changeRequest);
+    			System.out.println("C-->S: " + changeRequest);
+    			response = receiveMessageFromServer();
+    			System.out.println("S-->C: " + response);
+    			
+    		} catch (JSONException e) {
+                e.printStackTrace();
+                System.out.println("Error parsing JSON response");
+            }
+    	}
+    	
+    	
+    	//System.out.println("Funcionou");
+    }
+   
     @FXML
     protected void onLogoutClick() {
         if (connected) {
             String logoutRequest = "{ \"action\": \"logout\", \"data\": { \"token\": \"" + token + "\" } }";
-            System.out.println("Mandando para servidor: " + logoutRequest);
+            System.out.println("------------------------------------------------------------------");
+            System.out.println("C-->S: " + logoutRequest);
             sendMessageToServer(logoutRequest);
 
             String response = receiveMessageFromServer();
@@ -340,7 +562,7 @@ public class ClientController {
                         String message = jsonResponse.getString("message");
 
                         if (!error) {
-                            System.out.println("Resposta do servidor: " + response);
+                            System.out.println("S-->C: " + response);
 
                             emailField.setText("");
                             passwordField.setText("");
@@ -357,7 +579,7 @@ public class ClientController {
                             goToConnection();
                         } else {
                             showWarning(message);
-                            System.out.println("Resposta do servidor: " + response);
+                            System.out.println("S-->C: " + response);
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -366,16 +588,15 @@ public class ClientController {
                 });
             }
         } else {
-            showWarning("Conexão falhou");
+            showWarning("Erro na conexão!");
         }
     }
 
     @FXML
     protected void onSelfDeleteClick() {
         if (connected) {
-            // Ask for email using an input dialog
             TextInputDialog emailDialog = new TextInputDialog();
-            emailDialog.setTitle("Email Input");
+            emailDialog.setTitle("Para confirmar a exclusão digite seu e-mail");
             emailDialog.setHeaderText("Enter Email:");
             emailDialog.setContentText("Email:");
             Optional<String> emailResult = emailDialog.showAndWait();
@@ -383,18 +604,17 @@ public class ClientController {
             if (emailResult.isPresent()) {
                 String email = emailResult.get();
 
-                // Ask for password using an input dialog
                 TextInputDialog passwordDialog = new TextInputDialog();
-                passwordDialog.setTitle("Password Input");
+                passwordDialog.setTitle("Para confirmar a exclusão digite sua senha");
                 passwordDialog.setHeaderText("Enter Password:");
                 passwordDialog.setContentText("Password:");
                 Optional<String> passwordResult = passwordDialog.showAndWait();
 
                 if (passwordResult.isPresent()) {
-                    String password = passwordResult.get();
+                    String password = hashPasswordMD5(passwordResult.get());
 
                     String logoutRequest = "{ \"action\": \"excluir-proprio-usuario\", \"data\": { \"token\": \"" + token + "\", \"email\": \"" + email + "\", \"password\": \"" + password + "\" } }";
-                    System.out.println("Mandando para servidor: " + logoutRequest);
+                    System.out.println("C-->S: " + logoutRequest);
                     sendMessageToServer(logoutRequest);
 
                     String response = receiveMessageFromServer();
@@ -407,7 +627,7 @@ public class ClientController {
                                 String message = jsonResponse.getString("message");
 
                                 if (!error) {
-                                    System.out.println("Resposta do servidor: " + response);
+                                    System.out.println("S-->C: " + response);
 
                                     emailField.setText("");
                                     passwordField.setText("");
@@ -422,7 +642,7 @@ public class ClientController {
                                     goToConnection();
                                 } else {
                                     showWarning(message);
-                                    System.out.println("Resposta do servidor: " + response);
+                                    System.out.println("S-->C: " + response);
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -437,7 +657,32 @@ public class ClientController {
         }
     }
 
-
+    @FXML
+    private void onDeleteUserClick() {
+    	
+    	String id = deleteUserId.getText();
+    	String deleteRequest = "{ \"action\": \"excluir-usuario\", \"data\": { \"token\": \"" + token + "\", \"user_id\": \"" + id + "\"} }";
+    	
+    	sendMessageToServer(deleteRequest);
+    	System.out.println("C-->S: " + deleteRequest);
+    	
+    	String response = receiveMessageFromServer();
+    	
+    	try {
+    		JSONObject jsonResponse = new JSONObject(response);
+    		System.out.println("S-->C: " + jsonResponse.toString());
+            if(jsonResponse.getBoolean("error")) {
+                showWarning(jsonResponse.getString("message"));
+            }
+            else {
+                showWarning("Usuário removido com sucesso");
+            }
+    	} catch(JSONException e) {
+    		System.out.println(e);
+    	}
+    	
+    }
+    
     private void sendMessageToServer(String message) {
         try {
             OutputStream out = clientSocket.getOutputStream();
