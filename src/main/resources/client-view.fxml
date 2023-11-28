@@ -54,10 +54,10 @@
 
    	<VBox fx:id="profileBox" alignment="CENTER" managed="false" spacing="10.0" visible="false">
 		<HBox alignment="CENTER">
-	        <Button fx:id="myDataButton" mnemonicParsing="false" onAction="#onMyDataClick" text="Ver meus dados" />
+	        <Button visible="false" fx:id="myDataButton" mnemonicParsing="false" onAction="#onMyDataClick" text="Ver meus dados" />
 	        <Button fx:id="changeUserButton" mnemonicParsing="false" onAction="#onChangeUserClick" text="Alterar conta" />
             <Button fx:id="logoutButton" mnemonicParsing="false" onAction="#onLogoutClick" text="Logout" />
-            <Button fx:id="selfDeleteButton" mnemonicParsing="false" onAction="#onSelfDeleteClick" text="Excluir conta" />
+            <Button fx:id="selfDeleteButton" mnemonicParsing="false" onAction="#onSelfDeleteClick" text="Excluir minha conta" />
 	    </HBox>
 	    <!-- Add the text box below the buttons -->
 	    <HBox fx:id="deleteUserBox" alignment="CENTER" visible="false" managed="false">

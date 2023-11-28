@@ -476,7 +476,7 @@ public class ClientController {
 		        	String type = userObject.getString("type");
 		        	String email = userObject.getString("email");
 		        	
-		        	Text usuario = new Text("ID: " + id + " | Nome: " + name + " | Tipo: " + type + " | email: " + email);
+		        	Text usuario = new Text("Id: " + id + " - Nome: " + name + " - " + type + " | E-mail: " + email);
 		        	listBox.getChildren().add(usuario);		        	
 		        }		       
 	    	} catch(JSONException e) {
