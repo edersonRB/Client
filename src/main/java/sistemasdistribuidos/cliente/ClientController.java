@@ -52,6 +52,9 @@ public class ClientController {
     private VBox profileBox;
 
     @FXML
+    private HBox newPointBox;
+
+    @FXML
     private TextField emailField;
 
     @FXML
@@ -65,7 +68,13 @@ public class ClientController {
 
     @FXML
     private PasswordField register_password;
-    
+
+    @FXML
+    private TextField pointName;
+
+    @FXML
+    private TextField pointObs;
+
     @FXML
     private VBox listBox;
     
@@ -86,13 +95,22 @@ public class ClientController {
     
     @FXML
     private Button changeButton;
-    
+
+    @FXML
+    private Button newPointButton;
+
     @FXML
     private TextField deleteUserId;
     
     @FXML
     private HBox deleteUserBox;
-    
+
+    @FXML
+    private TextField deletePointId;
+
+    @FXML
+    private HBox deletePointBox;
+
     @FXML
     private Button listUsersButton;
     private boolean connected = false;
@@ -149,6 +167,8 @@ public class ClientController {
         registerBox.setManaged(false);
         changeBox.setVisible(false);
         changeBox.setManaged(false);
+        newPointBox.setVisible(false);
+        newPointBox.setManaged(false);
     }
     @FXML
     private void goToLogin() {
@@ -163,6 +183,8 @@ public class ClientController {
         registerBox.setManaged(false);
         changeBox.setVisible(false);
         changeBox.setManaged(false);
+        newPointBox.setVisible(false);
+        newPointBox.setManaged(false);
     }
 
     private void goToProfile() {
@@ -177,8 +199,26 @@ public class ClientController {
         registerBox.setManaged(false);
         changeBox.setVisible(false);
         changeBox.setManaged(false);
+        newPointBox.setVisible(false);
+        newPointBox.setManaged(false);
     }
 
+    @FXML
+    private void goToNewPoint() {
+        setTitle("Cadastrar novo ponto");
+        connectBox.setVisible(false);
+        connectBox.setManaged(false);
+        profileBox.setVisible(false);
+        profileBox.setManaged(false);
+        loginBox.setVisible(false);
+        loginBox.setManaged(false);
+        registerBox.setVisible(false);
+        registerBox.setManaged(false);
+        changeBox.setVisible(false);
+        changeBox.setManaged(false);
+        newPointBox.setVisible(true);
+        newPointBox.setManaged(true);
+    }
     private void goToRegister() {
         setTitle("Cadastre-se");
         connectBox.setVisible(false);
@@ -260,12 +300,20 @@ public class ClientController {
                                 listUsersButton.setManaged(true);
                                 deleteUserBox.setVisible(true);
                                 deleteUserBox.setManaged(true);
+                                deletePointBox.setVisible(true);
+                                deletePointBox.setManaged(true);
+                                newPointButton.setVisible(true);
+                                newPointButton.setManaged(true);
                             }
                             else {
-                                listUsersButton.setVisible(true);
-                                listUsersButton.setManaged(true);
-                                deleteUserBox.setVisible(true);
-                                deleteUserBox.setManaged(true);
+                                listUsersButton.setVisible(false);
+                                listUsersButton.setManaged(false);
+                                deleteUserBox.setVisible(false);
+                                deleteUserBox.setManaged(false);
+                                deletePointBox.setVisible(false);
+                                deletePointBox.setManaged(false);
+                                newPointButton.setVisible(false);
+                                newPointButton.setManaged(false);
                             }
                         } else {
                             showWarning(message);
@@ -287,6 +335,10 @@ public class ClientController {
         register_name.clear();
     }
 
+    private void clearNewPointFields() {
+        pointName.clear();
+        pointObs.clear();
+    }
     private void clearLoginFields() {
         emailField.clear();
         passwordField.clear();
@@ -348,6 +400,49 @@ public class ClientController {
 
                         if (!error && action.equals("autocadastro-usuario")) {
                             clearRegisterFields();
+                        } else {
+                            showWarning(message);
+                        }
+                        System.out.println("S-->C: " + response);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        System.out.println("Error parsing JSON response");
+                    }
+                });
+            }
+        } else {
+            showWarning("Erro na conexão!");
+        }
+    }
+
+    @FXML
+    protected void onNewPointClick() {
+        goToNewPoint();
+    }
+
+    @FXML
+    protected void onSaveNewPointClick() {
+        if (connected) {
+            String name = pointName.getText();
+            String obs = pointObs.getText();
+
+            String registerRequest = "{ \"action\": \"cadastro-ponto\", \"data\": {  \"token\": \"" + token + "\", \"name\": \"" + name + "\", \"obs\": \"" + obs + "\" } }";
+
+            System.out.println("C-->S: " + registerRequest);
+            sendMessageToServer(registerRequest);
+
+            String response = receiveMessageFromServer();
+            if (response != null) {
+                Platform.runLater(() -> {
+                    try {
+                        JSONObject jsonResponse = new JSONObject(response);
+
+                        String action = jsonResponse.getString("action");
+                        boolean error = jsonResponse.getBoolean("error");
+                        String message = jsonResponse.getString("message");
+
+                        if (!error && action.equals("cadastro-ponto")) {
+                            clearNewPointFields();
                         } else {
                             showWarning(message);
                         }
@@ -480,6 +575,38 @@ public class ClientController {
 		        	listBox.getChildren().add(usuario);		        	
 		        }		       
 	    	} catch(JSONException e) {
+            System.out.println(e.toString());
+        }
+    }
+
+    @FXML
+    protected void onListPointsClick() {
+        String listRequest = "{ \"action\": \"listar-pontos\", \"data\": {  \"token\": \"" + token + "\"} }";
+        System.out.println("C-->S: " + listRequest);
+        sendMessageToServer(listRequest);
+
+        String response = receiveMessageFromServer();
+        System.out.println("S-->C: " + response);
+
+        try {
+            JSONObject jsonObject = new JSONObject(response);
+            JSONObject dataObject = jsonObject.getJSONObject("data");
+            JSONArray pointsArray = dataObject.getJSONArray("pontos");
+
+            listBox.setVisible(true);
+            listBox.getChildren().clear();
+
+            for (int i = 0; i < pointsArray.length(); i++) {
+                JSONObject pointObject = pointsArray.getJSONObject(i);
+
+                String id = pointObject.getString("id");
+                String name = pointObject.getString("name");
+                String obs = pointObject.getString("obs");
+
+                Text usuario = new Text("Id: " + id + " - Nome: " + name + " | Obs: " + obs);
+                listBox.getChildren().add(usuario);
+            }
+        } catch(JSONException e) {
             System.out.println(e.toString());
         }
     }
@@ -681,6 +808,32 @@ public class ClientController {
     		System.out.println(e);
     	}
     	
+    }
+
+    @FXML
+    private void onDeletePointClick() {
+
+        String id = deletePointId.getText();
+        String deleteRequest = "{ \"action\": \"excluir-ponto\", \"data\": { \"token\": \"" + token + "\", \"ponto_id\": \"" + id + "\"} }";
+
+        sendMessageToServer(deleteRequest);
+        System.out.println("C-->S: " + deleteRequest);
+
+        String response = receiveMessageFromServer();
+
+        try {
+            JSONObject jsonResponse = new JSONObject(response);
+            System.out.println("S-->C: " + jsonResponse.toString());
+            if(jsonResponse.getBoolean("error")) {
+                showWarning(jsonResponse.getString("message"));
+            }
+            else {
+                showWarning("Ponto removido com sucesso");
+            }
+        } catch(JSONException e) {
+            System.out.println(e);
+        }
+
     }
     
     private void sendMessageToServer(String message) {
