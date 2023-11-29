@@ -5,6 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
+<?import com.sun.javafx.scene.control.IntegerField?>
 <VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sistemasdistribuidos.cliente.ClientController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
@@ -43,6 +44,24 @@
         <Button fx:id="registerPointButton" onAction="#onSaveNewPointClick" text="Cadastrar" />
         <Button  onAction="#ongoToProfile" text="Voltar" />
     </HBox>
+
+    <VBox fx:id="newSegmentBox" alignment="CENTER_LEFT" managed="false" spacing="10.0" visible="false">
+        <Label text="ID do ponto de origem" />
+        <TextField fx:id="segmentOrigin" />
+        <Label text="ID do ponto de destino" />
+        <TextField fx:id="segmentDestiny" />
+        <Label text="Direção" />
+        <TextField fx:id="segmentDirection" />
+        <Label text="Distância" />
+        <TextField fx:id="segmentDistance" />
+        <Label text="Observação" />
+        <TextField fx:id="segmentObs" />
+        <HBox alignment="CENTER">
+            <Button fx:id="registerSegmentButton" onAction="#onSaveNewSegmentClick" text="Cadastrar" />
+
+            <Button  onAction="#ongoToProfile" text="Voltar" />
+        </HBox>
+    </VBox>
    
    <VBox fx:id="registerBox" managed="false" spacing="10" visible="false">
       <children>
@@ -65,7 +84,8 @@
 		<HBox alignment="CENTER">
             <Button visible="false" fx:id="myDataButton" mnemonicParsing="false" onAction="#onMyDataClick" text="Ver meus dados" />
             <Button visible="false" fx:id="newPointButton" mnemonicParsing="false" onAction="#onNewPointClick" text="Novo Ponto" />
-	        <Button fx:id="changeUserButton" mnemonicParsing="false" onAction="#onChangeUserClick" text="Alterar conta" />
+            <Button visible="false" fx:id="newSegmentButton" mnemonicParsing="false" onAction="#onNewSegmentClick" text="Novo Segmento" />
+            <Button fx:id="changeUserButton" mnemonicParsing="false" onAction="#onChangeUserClick" text="Alterar conta" />
             <Button fx:id="logoutButton" mnemonicParsing="false" onAction="#onLogoutClick" text="Logout" />
             <Button fx:id="selfDeleteButton" mnemonicParsing="false" onAction="#onSelfDeleteClick" text="Excluir minha conta" />
 	    </HBox>
@@ -79,6 +99,11 @@
             <Button fx:id="listPointsButton" mnemonicParsing="false" onAction="#onListPointsClick" text="Ver todos os pontos" />
             <TextField fx:id="deletePointId" promptText="ID do ponto" />
             <Button fx:id="deletePointButton" mnemonicParsing="false" onAction="#onDeletePointClick" text="Deletar Ponto" />
+        </HBox>
+        <HBox fx:id="deleteSegmentBox" alignment="CENTER" visible="false" managed="false">
+            <Button fx:id="listSegmentsButton" mnemonicParsing="false" onAction="#onListSegmentsClick" text="Ver todos os segmentos" />
+            <TextField fx:id="deleteSegmentId" promptText="ID do segmento" />
+            <Button fx:id="deleteSegmentButton" mnemonicParsing="false" onAction="#onDeleteSegmentClick" text="Deletar segmento" />
         </HBox>
 	    <VBox fx:id="listBox">
 		</VBox>	  		
