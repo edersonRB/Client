@@ -1,5 +1,7 @@
 package sistemasdistribuidos.cliente;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -45,6 +47,9 @@ public class ClientController {
 
     @FXML
     private HBox connectBox;
+
+    @FXML
+    private VBox routeBox;
 
     @FXML
     private VBox registerBox;
@@ -113,6 +118,12 @@ public class ClientController {
     private TextField deletePointId;
 
     @FXML
+    private Button deletePointButton;
+
+    @FXML
+    private Button routeButton;
+
+    @FXML
     private TextField deleteSegmentId;
 
     @FXML
@@ -139,6 +150,13 @@ public class ClientController {
     @FXML
     private TextField segmentDestiny;
 
+
+    @FXML
+    private TextField routeOrigin;
+
+    @FXML
+    private TextField routeDestiny;
+
     private boolean connected = false;
 
     private User user;
@@ -147,8 +165,33 @@ public class ClientController {
 
     private ArrayList<Segment> segmentList = new ArrayList<>();
 
+    private ArrayList<Segment> route = new ArrayList<>();
+
     private String token;
     private Socket clientSocket;
+
+    @FXML
+    private TableView<RouteTableItem> table;
+
+    @FXML
+    private TableColumn<RouteTableItem, Number> tbid;
+
+    @FXML
+    private TableColumn<RouteTableItem, String> tborigem;
+
+    @FXML
+    private TableColumn<RouteTableItem, String> tbdestino;
+
+    @FXML
+    private TableColumn<RouteTableItem, Number> tbdistancia;
+
+    @FXML
+    private TableColumn<RouteTableItem, String> tbdirecao;
+
+    @FXML
+    private TableColumn<RouteTableItem, String> tbobs;
+
+    private ObservableList<RouteTableItem> routeTableData = FXCollections.observableArrayList();
 
     @FXML
     protected void onHelloButtonClick() {
@@ -202,6 +245,8 @@ public class ClientController {
         newPointBox.setManaged(false);
         newSegmentBox.setManaged(false);
         newSegmentBox.setVisible(false);
+        routeBox.setVisible(false);
+        routeBox.setManaged(false);
     }
     @FXML
     private void goToLogin() {
@@ -220,6 +265,8 @@ public class ClientController {
         newPointBox.setManaged(false);
         newSegmentBox.setManaged(false);
         newSegmentBox.setVisible(false);
+        routeBox.setVisible(false);
+        routeBox.setManaged(false);
     }
 
     private void goToProfile() {
@@ -238,6 +285,8 @@ public class ClientController {
         newPointBox.setManaged(false);
         newSegmentBox.setManaged(false);
         newSegmentBox.setVisible(false);
+        routeBox.setVisible(false);
+        routeBox.setManaged(false);
     }
 
     @FXML
@@ -257,6 +306,8 @@ public class ClientController {
         newPointBox.setManaged(true);
         newSegmentBox.setManaged(false);
         newSegmentBox.setVisible(false);
+        routeBox.setVisible(false);
+        routeBox.setManaged(false);
     }
 
     @FXML
@@ -276,6 +327,8 @@ public class ClientController {
         newPointBox.setManaged(false);
         newSegmentBox.setManaged(true);
         newSegmentBox.setVisible(true);
+        routeBox.setVisible(false);
+        routeBox.setManaged(false);
     }
     private void goToRegister() {
         setTitle("Cadastre-se");
@@ -291,6 +344,8 @@ public class ClientController {
         changeBox.setManaged(false);
         newSegmentBox.setManaged(false);
         newSegmentBox.setVisible(false);
+        routeBox.setVisible(false);
+        routeBox.setManaged(false);
     }
 
     private void goToChange() {
@@ -307,6 +362,28 @@ public class ClientController {
         changeBox.setManaged(true);
         newSegmentBox.setManaged(false);
         newSegmentBox.setVisible(false);
+        routeBox.setVisible(false);
+        routeBox.setManaged(false);
+    }
+
+    private void goToRoute() {
+        setTitle("Rota");
+        connectBox.setVisible(false);
+        connectBox.setManaged(false);
+        profileBox.setVisible(false);
+        profileBox.setManaged(false);
+        loginBox.setVisible(false);
+        loginBox.setManaged(false);
+        registerBox.setVisible(false);
+        registerBox.setManaged(false);
+        changeBox.setVisible(false);
+        changeBox.setManaged(false);
+        newPointBox.setVisible(false);
+        newPointBox.setManaged(false);
+        newSegmentBox.setManaged(false);
+        newSegmentBox.setVisible(false);
+        routeBox.setVisible(true);
+        routeBox.setManaged(true);
     }
     
     private void showWarning(String message) {
@@ -362,8 +439,15 @@ public class ClientController {
                                 listUsersButton.setManaged(true);
                                 deleteUserBox.setVisible(true);
                                 deleteUserBox.setManaged(true);
-                                deletePointBox.setVisible(true);
-                                deletePointBox.setManaged(true);
+
+                                deletePointId.setVisible(true);
+                                deletePointId.setManaged(true);
+                                deletePointButton.setVisible(true);
+                                deletePointButton.setManaged(true);
+
+                                routeButton.setVisible(false);
+                                routeButton.setManaged(false);
+
                                 deleteSegmentBox.setVisible(true);
                                 deleteSegmentBox.setManaged(true);
                                 newPointButton.setVisible(true);
@@ -376,14 +460,20 @@ public class ClientController {
                                 listUsersButton.setManaged(false);
                                 deleteUserBox.setVisible(false);
                                 deleteUserBox.setManaged(false);
-                                deletePointBox.setVisible(false);
-                                deletePointBox.setManaged(false);
-                                deleteSegmentBox.setVisible(true);
-                                deleteSegmentBox.setManaged(true);
+
+                                deletePointId.setVisible(false);
+                                deletePointId.setManaged(false);
+                                deletePointButton.setVisible(false);
+                                deletePointButton.setManaged(false);
+                                routeButton.setVisible(true);
+                                routeButton.setManaged(true);
+
+                                deleteSegmentBox.setVisible(false);
+                                deleteSegmentBox.setManaged(false);
                                 newPointButton.setVisible(false);
                                 newPointButton.setManaged(false);
-                                newSegmentButton.setVisible(true);
-                                newSegmentButton.setManaged(true);
+                                newSegmentButton.setVisible(false);
+                                newSegmentButton.setManaged(false);
                             }
                         } else {
                             showWarning(message);
@@ -428,6 +518,12 @@ public class ClientController {
     protected void ongoToProfile() {
     	goToProfile();
     }
+
+    @FXML
+    protected void onGoToRoute() {
+        goToRoute();
+    }
+
     @FXML
     protected void onChangeUserClick() {
     	clearChangeFields();
@@ -441,7 +537,7 @@ public class ClientController {
     		//change_id.setEditable(false);
     		//change_id.setText("1");
     	}
-    	
+
     	goToChange();
     }
 
@@ -600,6 +696,7 @@ public class ClientController {
                 String direction = segmentObject.getString("direcao");
                 int distance = segmentObject.getInt("distancia");
                 String obs = segmentObject.getString("obs");
+                boolean blocked = segmentObject.getBoolean("bloqueado");
 
                 JSONObject origin = segmentObject.getJSONObject("ponto_origem");
                 int originId = origin.getInt("id");
@@ -614,13 +711,13 @@ public class ClientController {
                 Point pointDestiny = new Point(destinyId, destinyName, destinyObs);
 
                 // Create a Point object (you may need to create a Point class)
-                Segment segment = new Segment(id, pointOrigin, pointDestiny, direction, distance, obs);
+                Segment segment = new Segment(id, pointOrigin, pointDestiny, direction, distance, obs, blocked);
 
                 // Add the point to the list
                 segmentList.add(segment);
 
                 // Display the point in the UI
-                Text textSegment = new Text("Id: " + id + " - Direção: " + direction + " | Obs: " + obs + " PONTO ORIGEM:" + pointOrigin.toString()+ "==> PONTO DESTINO:" + pointDestiny.toString());
+                Text textSegment = new Text("Id: " + id + " - Direção: " + direction + " | Obs: " + obs + " | Bloqueado?: " + blocked + " PONTO ORIGEM:" + pointOrigin.toString()+ "==> PONTO DESTINO:" + pointDestiny.toString());
                 listBox.getChildren().add(textSegment);
             }
         } catch (JSONException e) {
@@ -697,11 +794,11 @@ public class ClientController {
 
             try {
                 request.put("action","cadastro-segmento");
-                request.put("token",token);
 
                 segment.put("direcao",direction);
                 segment.put("distancia",distance);
                 segment.put("obs",obs);
+                segment.put("bloqueado",false);
 
                 origin.put("id",originPoint.getId());
                 origin.put("name",originPoint.getName());
@@ -714,6 +811,7 @@ public class ClientController {
                 segment.put("ponto_destino",destiny);
 
                 data.put("segmento",segment);
+                data.put("token",token);
                 request.put("data",data);
             }
             catch(JSONException e) {
@@ -750,6 +848,203 @@ public class ClientController {
         }
     }
 
+    @FXML
+    protected void onRequestRouteClick() {
+        findPoints();
+
+        if (connected) {
+            int id_origin = -1;
+            int id_destiny = -1;
+            Point originPoint = null;
+            Point destinyPoint = null;
+
+            try {
+                id_origin = Integer.parseInt(routeOrigin.getText());
+            } catch (NumberFormatException e) {
+                showWarning("O id de origem deve ser um número!");
+                System.err.println("Input is not a valid number: " + routeOrigin.getText());
+                return;
+            }
+
+            try {
+                id_destiny = Integer.parseInt(routeDestiny.getText());
+            } catch (NumberFormatException e) {
+                showWarning("O id de destino deve ser um número!");
+                System.err.println("Input is not a valid number: " + routeDestiny.getText());
+                return;
+            }
+
+            for (Point point : pointList) {
+                if (point.getId() == id_origin) {
+                    originPoint = point;
+                } else if (point.getId() == id_destiny) {
+                    destinyPoint = point;
+                }
+
+                if (originPoint != null && destinyPoint != null) {
+                    break;
+                }
+            }
+
+            if (originPoint == null) {
+                System.out.println("Ponto de origem não encontrado: " + id_origin);
+                showWarning("Ponto de origem com id " + id_origin + " não encontrado!");
+                return;
+            }
+
+            if (destinyPoint == null) {
+                System.out.println("Ponto de destino não encontrado: " + id_destiny);
+                showWarning("Ponto de destino com id " + id_destiny + " não encontrado!");
+                return;
+            }
+
+            JSONObject request = new JSONObject();
+            JSONObject data = new JSONObject();
+            JSONObject origin = new JSONObject();
+            JSONObject destiny = new JSONObject();
+
+            try {
+                request.put("action","pedido-rotas");
+
+                origin.put("id",originPoint.getId());
+                origin.put("name",originPoint.getName());
+                origin.put("obs",originPoint.getObs());
+                data.put("ponto_origem",origin);
+
+                destiny.put("id",destinyPoint.getId());
+                destiny.put("name",destinyPoint.getName());
+                destiny.put("obs",destinyPoint.getObs());
+                data.put("ponto_destino",destiny);
+
+                request.put("data",data);
+            }
+            catch(JSONException e) {
+                System.out.println(e.toString());
+            }
+
+            System.out.println("C-->S: " + request.toString());
+            sendMessageToServer(request.toString());
+
+            String response = receiveMessageFromServer();
+            if (response != null) {
+                Platform.runLater(() -> {
+                    try {
+                        JSONObject jsonResponse = new JSONObject(response);
+
+//                        String action = jsonResponse.getString("action");
+                        boolean error = jsonResponse.getBoolean("error");
+                        String message = jsonResponse.getString("message");
+                        JSONArray segmentsArray = jsonResponse.getJSONArray("segmentos");
+
+                        if (!error) {
+                            route.clear();
+                            for (int i = 0; i < segmentsArray.length(); i++) {
+                                JSONObject segmentObject = segmentsArray.getJSONObject(i);
+
+                                int id = 0;
+                                String direction = segmentObject.getString("direcao");
+                                int distance = segmentObject.getInt("distancia");
+                                String obs = segmentObject.getString("obs");
+                                boolean blocked = false;
+
+                                JSONObject currentOrigin = segmentObject.getJSONObject("ponto_origem");
+                                int originId = currentOrigin.getInt("id");
+                                String originName = currentOrigin.getString("name");
+                                String originObs = currentOrigin.getString("obs");
+                                Point pointOrigin = new Point(originId, originName, originObs);
+
+                                JSONObject currentDestiny = segmentObject.getJSONObject("ponto_destino");
+                                int destinyId = currentDestiny.getInt("id");
+                                String destinyName = currentDestiny.getString("name");
+                                String destinyObs = currentDestiny.getString("obs");
+                                Point pointDestiny = new Point(destinyId, destinyName, destinyObs);
+
+                                // Create a Point object (you may need to create a Point class)
+                                Segment segment = new Segment(id, pointOrigin, pointDestiny, direction, distance, obs, blocked);
+
+                                // Add the point to the list
+                                route.add(segment);
+                            }
+
+                            updateTable();
+                        } else {
+                            showWarning(message);
+                        }
+                        System.out.println("S-->C: " + response);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        System.out.println("Error parsing JSON response");
+                    }
+                });
+            }
+        } else {
+            showWarning("Erro na conexão!");
+        }
+    }
+
+    private void updateTable() {
+        tbid.setCellValueFactory(cellData -> cellData.getValue().idProperty());
+        tborigem.setCellValueFactory(cellData -> cellData.getValue().origemProperty());
+        tbdestino.setCellValueFactory(cellData -> cellData.getValue().destinoProperty());
+        tbdistancia.setCellValueFactory(cellData -> cellData.getValue().distanciaProperty());
+        tbdirecao.setCellValueFactory(cellData -> cellData.getValue().direcaoProperty());
+        tbobs.setCellValueFactory(cellData -> cellData.getValue().obsProperty());
+
+        routeTableData.clear();
+        // Add data to the table
+        for (int i = 0; i < route.size(); i++) {
+            Segment segment = route.get(i);
+            segment.setId(i);
+            routeTableData.add(new RouteTableItem(segment));
+        }
+
+
+        // Set data to the TableView
+        table.setItems(routeTableData);
+    }
+
+    @FXML
+    protected void onMyDataClick() {
+        if (connected) {
+            String myDataRequest = "{ \"action\": \"pedido-proprio-usuario\", \"data\": {  \"token\": \"" + token + "\"} }";
+
+            System.out.println("C-->S: " + myDataRequest);
+            sendMessageToServer(myDataRequest);
+
+            String response = receiveMessageFromServer();
+            if (response != null) {
+                Platform.runLater(() -> {
+                    try {
+                        JSONObject jsonResponse = new JSONObject(response);
+                        JSONObject jsonData = jsonResponse.getJSONObject("data");
+
+                        String action = jsonResponse.getString("action");
+                        boolean error = jsonResponse.getBoolean("error");
+                        String message = jsonResponse.getString("message");
+
+                        if (!error && action.equals("pedido-proprio-usuario")) {
+                            user = new User(
+                                    Integer.parseInt(jsonData.getJSONObject("user").getString("id")),
+                                    jsonData.getJSONObject("user").getString("name"),
+                                    jsonData.getJSONObject("user").getString("email"),
+                                    token
+                                    );
+                            user.setAdmin(jsonData.getJSONObject("user").getString("type").equals("admin"));
+                            showUser(user);
+                        } else {
+                            showWarning(message);
+                        }
+                        System.out.println("S-->C: " + response);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        System.out.println("Error parsing JSON response");
+                    }
+                });
+            }
+        } else {
+            showWarning("Erro na conexão!");
+        }
+    }
     protected void findMyUser() {
         if (connected) {
             String myDataRequest = "{ \"action\": \"pedido-proprio-usuario\", \"data\": {  \"token\": \"" + token + "\"} }";
@@ -780,48 +1075,6 @@ public class ClientController {
                             change_id.setText(Integer.toString(user.getId()));
                             change_email.setText(user.getEmail());
                             change_name.setText(user.getName());
-                        } else {
-                            showWarning(message);
-                        }
-                        System.out.println("S-->C: " + response);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        System.out.println("Error parsing JSON response");
-                    }
-                });
-            }
-        } else {
-            showWarning("Erro na conexão!");
-        }
-    }
-    @FXML
-    protected void onMyDataClick() {
-        if (connected) {
-            String myDataRequest = "{ \"action\": \"pedido-proprio-usuario\", \"data\": {  \"token\": \"" + token + "\"} }";
-
-            System.out.println("C-->S: " + myDataRequest);
-            sendMessageToServer(myDataRequest);
-
-            String response = receiveMessageFromServer();
-            if (response != null) {
-                Platform.runLater(() -> {
-                    try {
-                        JSONObject jsonResponse = new JSONObject(response);
-                        JSONObject jsonData = jsonResponse.getJSONObject("data");
-                        
-                        String action = jsonResponse.getString("action");
-                        boolean error = jsonResponse.getBoolean("error");
-                        String message = jsonResponse.getString("message");
-
-                        if (!error && action.equals("pedido-proprio-usuario")) {
-                            user = new User(
-                                    Integer.parseInt(jsonData.getJSONObject("user").getString("id")),
-                                    jsonData.getJSONObject("user").getString("name"),
-                                    jsonData.getJSONObject("user").getString("email"),
-                                    token
-                                    );
-                            user.setAdmin(jsonData.getJSONObject("user").getString("type").equals("admin"));
-                            showUser(user);
                         } else {
                             showWarning(message);
                         }
@@ -959,10 +1212,13 @@ public class ClientController {
                         String message = jsonResponse.getString("message");
 
                         if (!error) {
+                            listBox.getChildren().clear();
+
                             System.out.println("S-->C: " + response);
 
                             emailField.setText("");
                             passwordField.setText("");
+
 
                             if (clientSocket != null && !clientSocket.isClosed()) {
                                 try {
@@ -1099,6 +1355,118 @@ public class ClientController {
             }
             else {
                 showWarning("Ponto removido com sucesso");
+            }
+        } catch(JSONException e) {
+            System.out.println(e);
+        }
+
+    }
+
+    private void alterSegment(Segment segmentObject) {
+        if (connected) {
+            JSONObject request = new JSONObject();
+            JSONObject data = new JSONObject();
+            JSONObject segment = new JSONObject();
+            JSONObject origin = new JSONObject();
+            JSONObject destiny = new JSONObject();
+
+            try {
+                request.put("action","edicao-segmento");
+
+                segment.put("id",segmentObject.getId());
+                segment.put("direcao",segmentObject.getDirection());
+                segment.put("distancia",segmentObject.getDistance());
+                segment.put("obs",segmentObject.getObs());
+                segment.put("bloqueado",segmentObject.isBlocked());
+
+                origin.put("id",segmentObject.getOrigin().getId());
+                origin.put("name",segmentObject.getOrigin().getName());
+                origin.put("obs",segmentObject.getOrigin().getObs());
+                segment.put("ponto_origem",origin);
+
+                destiny.put("id",segmentObject.getDestiny().getId());
+                destiny.put("name",segmentObject.getDestiny().getName());
+                destiny.put("obs",segmentObject.getDestiny().getObs());
+                segment.put("ponto_destino",destiny);
+
+                data.put("segmento",segment);
+                data.put("token",token);
+                request.put("data",data);
+            }
+            catch(JSONException e) {
+                System.out.println(e.toString());
+            }
+
+            System.out.println("C-->S: " + request.toString());
+            sendMessageToServer(request.toString());
+
+            String response = receiveMessageFromServer();
+            if (response != null) {
+                Platform.runLater(() -> {
+                    try {
+                        JSONObject jsonResponse = new JSONObject(response);
+
+                        String action = jsonResponse.getString("action");
+                        boolean error = jsonResponse.getBoolean("error");
+                        String message = jsonResponse.getString("message");
+
+                        if (!error && action.equals("edicao-ponto")) {
+                            showWarning("Segmento alterado com sucesso!");
+                        } else {
+                            showWarning(message);
+                        }
+                        System.out.println("S-->C: " + response);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        System.out.println("Error parsing JSON response");
+                    }
+                });
+            }
+        } else {
+            showWarning("Erro na conexão!");
+        }
+    }
+    @FXML
+    private void onSegmentBlockClick() {
+
+        int id = Integer.parseInt(deleteSegmentId.getText());
+        String deleteRequest = "{ \"action\": \"pedido-edicao-segmento\", \"data\": { \"token\": \"" + token + "\", \"segmento_id\": " + id + "} }";
+
+        sendMessageToServer(deleteRequest);
+        System.out.println("C-->S: " + deleteRequest);
+
+        String response = receiveMessageFromServer();
+
+        try {
+            JSONObject jsonResponse = new JSONObject(response);
+            System.out.println("S-->C: " + jsonResponse.toString());
+            if(jsonResponse.getBoolean("error")) {
+                showWarning(jsonResponse.getString("message"));
+            }
+            else {
+                JSONObject seg = jsonResponse.getJSONObject("data").getJSONObject("segmento");
+
+                int segmentId = seg.getInt("id");
+                String segmentDirection = seg.getString("direcao");
+                int segmentDistance = seg.getInt("distancia");
+                String segmentObs = seg.getString("obs");
+                boolean segmentIsBlocked = !seg.getBoolean("bloqueado");
+
+                JSONObject origin = seg.getJSONObject("ponto_origem");
+                int originId = origin.getInt("id");
+                String originName = origin.getString("name");
+                String originObs = origin.getString("obs");
+                Point pointOrigin = new Point(originId, originName, originObs);
+
+                JSONObject destiny = seg.getJSONObject("ponto_destino");
+                int destinyId = origin.getInt("id");
+                String destinyName = origin.getString("name");
+                String destinyObs = origin.getString("obs");
+                Point pointDestiny = new Point(destinyId, destinyName, destinyObs);
+
+                Segment segment = new Segment(segmentId,pointOrigin, pointDestiny, segmentDirection, segmentDistance, segmentObs, segmentIsBlocked);
+
+                alterSegment(segment);
             }
         } catch(JSONException e) {
             System.out.println(e);

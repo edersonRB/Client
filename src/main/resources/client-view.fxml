@@ -62,8 +62,30 @@
             <Button  onAction="#ongoToProfile" text="Voltar" />
         </HBox>
     </VBox>
-   
-   <VBox fx:id="registerBox" managed="false" spacing="10" visible="false">
+
+    <VBox fx:id="routeBox" alignment="CENTER_LEFT" managed="false" spacing="10.0" visible="false">
+        <Label text="ID do ponto de origem" />
+        <TextField fx:id="routeOrigin" />
+        <Label text="ID do ponto de destino" />
+        <TextField fx:id="routeDestiny" />
+        <HBox alignment="CENTER">
+            <Button fx:id="requestRouteButton" onAction="#onRequestRouteClick" text="Pedir rota" />
+            <Button onAction="#ongoToProfile" text="Voltar" />
+        </HBox>
+        <TableView fx:id="table" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                   AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <columns>
+                <TableColumn text="#" prefWidth="100" fx:id="tbid"/>
+                <TableColumn text="Origem" prefWidth="100" fx:id="tborigem"/>
+                <TableColumn text="Destino" prefWidth="200" fx:id="tbdestino"/>
+                <TableColumn text="Distância" prefWidth="200" fx:id="tbdistancia"/>
+                <TableColumn text="Direção" prefWidth="200" fx:id="tbdirecao"/>
+                <TableColumn text="Obs" prefWidth="200" fx:id="tbobs"/>
+            </columns>
+        </TableView>
+    </VBox>
+
+    <VBox fx:id="registerBox" managed="false" spacing="10" visible="false">
       <children>
            <Label text="Nome" />
            <TextField fx:id="register_name" />
@@ -82,9 +104,10 @@
 
    	<VBox fx:id="profileBox" alignment="CENTER" managed="false" spacing="10.0" visible="false">
 		<HBox alignment="CENTER">
-            <Button visible="false" fx:id="myDataButton" mnemonicParsing="false" onAction="#onMyDataClick" text="Ver meus dados" />
-            <Button visible="false" fx:id="newPointButton" mnemonicParsing="false" onAction="#onNewPointClick" text="Novo Ponto" />
-            <Button visible="false" fx:id="newSegmentButton" mnemonicParsing="false" onAction="#onNewSegmentClick" text="Novo Segmento" />
+            <Button visible="false" managed="false" fx:id="myDataButton" mnemonicParsing="false" onAction="#onMyDataClick" text="Ver meus dados" />
+            <Button visible="false" managed="false" fx:id="newPointButton" mnemonicParsing="false" onAction="#onNewPointClick" text="Novo Ponto" />
+            <Button visible="false" managed="false" fx:id="newSegmentButton" mnemonicParsing="false" onAction="#onNewSegmentClick" text="Novo Segmento" />
+            <Button visible="false" managed="false" fx:id="routeButton" mnemonicParsing="false" onAction="#onGoToRoute" text="Requisitar rota" />
             <Button fx:id="changeUserButton" mnemonicParsing="false" onAction="#onChangeUserClick" text="Alterar conta" />
             <Button fx:id="logoutButton" mnemonicParsing="false" onAction="#onLogoutClick" text="Logout" />
             <Button fx:id="selfDeleteButton" mnemonicParsing="false" onAction="#onSelfDeleteClick" text="Excluir minha conta" />
@@ -95,18 +118,24 @@
 	    	<TextField fx:id="deleteUserId" promptText="ID do usuario" />
 	    	<Button fx:id="deleteUserButton" mnemonicParsing="false" onAction="#onDeleteUserClick" text="Deletar Usuario" />
 	    </HBox>
-        <HBox fx:id="deletePointBox" alignment="CENTER" visible="false" managed="false">
+        <HBox fx:id="deletePointBox" alignment="CENTER" visible="true" managed="true">
             <Button fx:id="listPointsButton" mnemonicParsing="false" onAction="#onListPointsClick" text="Ver todos os pontos" />
-            <TextField fx:id="deletePointId" promptText="ID do ponto" />
-            <Button fx:id="deletePointButton" mnemonicParsing="false" onAction="#onDeletePointClick" text="Deletar Ponto" />
+            <TextField fx:id="deletePointId" promptText="ID do ponto" visible="false" managed="false"/>
+            <Button fx:id="deletePointButton" mnemonicParsing="false" onAction="#onDeletePointClick" text="Deletar Ponto" visible="false" managed="false" />
         </HBox>
         <HBox fx:id="deleteSegmentBox" alignment="CENTER" visible="false" managed="false">
             <Button fx:id="listSegmentsButton" mnemonicParsing="false" onAction="#onListSegmentsClick" text="Ver todos os segmentos" />
             <TextField fx:id="deleteSegmentId" promptText="ID do segmento" />
             <Button fx:id="deleteSegmentButton" mnemonicParsing="false" onAction="#onDeleteSegmentClick" text="Deletar segmento" />
+            <Button fx:id="blockPointButton" mnemonicParsing="false" onAction="#onSegmentBlockClick" text="Bloquear/desbloquear Ponto" />
         </HBox>
-	    <VBox fx:id="listBox">
-		</VBox>	  		
+        <ScrollPane>
+            <content>
+                <VBox fx:id="listBox">
+                    <!-- Your VBox content goes here -->
+                </VBox>
+            </content>
+        </ScrollPane>
     </VBox>
     
     <VBox fx:id="changeBox" managed="false" spacing="10" visible="false">
@@ -127,5 +156,5 @@
          </HBox>
       </children>
    </VBox>	      	
-    	
+
 </VBox>
